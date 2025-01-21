@@ -47,6 +47,11 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
     setIsRefreshing(false);
   };
 
+  useEffect(() => {
+    const interval = setInterval(refreshData, 5 * 60 * 1000); // Refresh every 5 minutes
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, []);
+
   const sortedUsers = [...users].sort((a, b) => b.score - a.score);
 
   if (!mounted) {
