@@ -1,7 +1,15 @@
 import RankingChangeEmail from "@/components/EmailTemplate";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Create a transporter object using SMTP transport with Mailtrap credentials
+const transporter = nodemailer.createTransport({
+  host: "live.smtp.mailtrap.io",
+  port: 587,
+  auth: {
+    user: process.env.MAILTRAP_USER,
+    pass: process.env.MAILTRAP_PASS,
+  },
+});
 
 export async function sendRankingChangeEmail(
   to: string,
@@ -11,16 +19,20 @@ export async function sendRankingChangeEmail(
   displacedBy?: string
 ) {
   try {
-    const data = await resend.emails.send({
-      from: "LeetCode Leaderboard <onboarding@resend.dev>",
+    const mailOptions = {
+      from: "LeetCode Leaderboard <onboarding@yourdomain.com>", // Change this to your email
       to: [to],
       subject: displacedBy
         ? `Your LeetCode ranking has changed`
         : `You've improved your LeetCode ranking!`,
-      react: RankingChangeEmail({ username, oldRank, newRank, displacedBy }),
-    });
+      html: JSON.stringify(
+        RankingChangeEmail({ username, oldRank, newRank, displacedBy })
+      ),
+    };
 
-    console.log("Email sent successfully:", data);
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("Email sent successfully:", info);
   } catch (error) {
     console.error("Error sending email:", error);
   }
