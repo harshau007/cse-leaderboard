@@ -20,7 +20,7 @@ export async function sendRankingChangeEmail(
 ) {
   try {
     const mailOptions = {
-      from: "LeetCode Leaderboard <onboarding@yourdomain.com>", // Change this to your email
+      from: "LeetCode Leaderboard <amanupadhyay2004@gmail.com>",
       to: [to],
       subject: displacedBy
         ? `Your LeetCode ranking has changed`
