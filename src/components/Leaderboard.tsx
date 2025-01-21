@@ -78,10 +78,10 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Leaderboard</h2>
           <div className="flex items-center space-x-4">
-            \\ <Button onClick={refreshData} disabled={isRefreshing}>
-             \\ <RefreshCw className="mr-2 h-4 w-4" />
-              \\Refresh
-           \\ </Button>
+            // <Button onClick={refreshData} disabled={isRefreshing}>
+             //<RefreshCw className="mr-2 h-4 w-4" />
+              //Refresh
+           // </Button>
             <div className="text-sm text-gray-600">
               Next update in: <span className="font-bold">{formattedTime}</span>
             </div>
