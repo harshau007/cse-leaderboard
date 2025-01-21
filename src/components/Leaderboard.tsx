@@ -24,6 +24,7 @@ interface LeaderboardProps {
 export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
   const [users, setUsers] = useState(initialUsers);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,12 +46,25 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
       console.error("Error refreshing data:", error);
     }
     setIsRefreshing(false);
+    setTimeLeft(5 * 60); // Reset timer to 5 minutes
   };
 
   useEffect(() => {
     const interval = setInterval(refreshData, 5 * 60 * 1000); // Refresh every 5 minutes
     return () => clearInterval(interval); // Cleanup on component unmount
   }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer); // Cleanup on component unmount
+  }, []);
+
+  const formattedTime = `${Math.floor(timeLeft / 60)
+    .toString()
+    .padStart(2, "0")}:${(timeLeft % 60).toString().padStart(2, "0")}`;
 
   const sortedUsers = [...users].sort((a, b) => b.score - a.score);
 
@@ -63,10 +77,15 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Leaderboard</h2>
-          <Button onClick={refreshData} disabled={isRefreshing}>
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Button onClick={refreshData} disabled={isRefreshing}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
+            <div className="text-sm text-gray-600">
+              Next update in: <span className="font-bold">{formattedTime}</span>
+            </div>
+          </div>
         </div>
         <div className="mb-4 flex space-x-6">
           <div>
