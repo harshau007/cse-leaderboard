@@ -30,7 +30,7 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
 
   const refreshData = useCallback(async () => {
     try {
-      const response = await fetch("/api/cron");
+      const response = await fetch("/api/data");
       if (response.ok) {
         const updatedUsersResponse = await fetch("/api/users");
         if (updatedUsersResponse.ok) {
