@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { POINTS } from "@/lib/points";
 import type { LeetCodeUser } from "@/lib/types";
-import { RefreshCw } from "lucide-react";
+// import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -23,7 +23,7 @@ interface LeaderboardProps {
 
 export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
   const [users, setUsers] = useState(initialUsers);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  // const [isRefreshing, setIsRefreshing] = useState(false);
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [mounted, setMounted] = useState(false);
 
@@ -32,7 +32,7 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
   }, []);
 
   const refreshData = async () => {
-    setIsRefreshing(true);
+    // setIsRefreshing(true);
     try {
       const response = await fetch("/api/cron");
       if (response.ok) {
@@ -45,7 +45,7 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
-    setIsRefreshing(false);
+    // setIsRefreshing(false);
     setTimeLeft(5 * 60); // Reset timer to 5 minutes
   };
 
