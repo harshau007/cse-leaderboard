@@ -13,6 +13,8 @@ export interface LeetCodeUser {
   hardSolved: number;
   totalSubmissions: number;
   score: number;
+  previousRank: number;
+  currentRank: number;
   lastUpdated: Date;
 }
 
@@ -41,7 +43,7 @@ export interface LeetCodeApiResponse {
       solutionCountDiff: number;
       categoryDiscussCount: number;
       categoryDiscussCountDiff: number;
-      certificationLevel: "NORMAL" | string; // Add other possible levels if known
+      certificationLevel: "NORMAL" | string;
     };
   };
 }

@@ -19,12 +19,21 @@ export async function GET(): Promise<NextResponse> {
       const totalSolved = easySolved + mediumSolved + hardSolved;
       const score = calculateScore(easySolved, mediumSolved, hardSolved);
 
-      await db.run(
+      await db.query(
         `
-        INSERT OR REPLACE INTO users (
+        INSERT INTO users (
           username, profile_url, total_solved, easy_solved, medium_solved, hard_solved, score, last_updated
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
-      `,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+        ON CONFLICT (username)
+        DO UPDATE SET
+          profile_url = EXCLUDED.profile_url,
+          total_solved = EXCLUDED.total_solved,
+          easy_solved = EXCLUDED.easy_solved,
+          medium_solved = EXCLUDED.medium_solved,
+          hard_solved = EXCLUDED.hard_solved,
+          score = EXCLUDED.score,
+          last_updated = NOW();
+        `,
         [
           username,
           response.matchedUser.profile.userAvatar,

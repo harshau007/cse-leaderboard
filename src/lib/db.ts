@@ -1,17 +1,21 @@
-import { open, Database as SqliteDatabase } from "sqlite";
-import sqlite3 from "sqlite3";
+import { Pool, type PoolClient } from "pg";
 import { POINTS } from "./points";
 
-let db: SqliteDatabase<sqlite3.Database> | null = null;
+let pool: Pool | null = null;
 
-export async function getDb(): Promise<SqliteDatabase<sqlite3.Database>> {
-  if (!db) {
-    db = await open({
-      filename: "./leetcode.db",
-      driver: sqlite3.Database,
+export async function getDb(): Promise<PoolClient> {
+  if (!pool) {
+    pool = new Pool({
+      user: process.env.POSTGRES_USER,
+      host: process.env.POSTGRES_HOST,
+      database: process.env.POSTGRES_DB,
+      password: process.env.POSTGRES_PASSWORD,
+      port: Number.parseInt(process.env.POSTGRES_PORT || "5432"),
     });
 
-    await db.exec(`
+    const client = await pool.connect();
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         username TEXT PRIMARY KEY,
         profile_url TEXT,
@@ -21,18 +25,22 @@ export async function getDb(): Promise<SqliteDatabase<sqlite3.Database>> {
         hard_solved INTEGER,
         total_submissions INTEGER,
         score INTEGER,
-        last_updated DATETIME
+        previous_rank INTEGER,
+        current_rank INTEGER,
+        last_updated TIMESTAMP
       )
     `);
+
+    client.release();
   }
 
-  return db;
+  return pool.connect();
 }
 
 export async function closeDb(): Promise<void> {
-  if (db) {
-    await db.close();
-    db = null;
+  if (pool) {
+    await pool.end();
+    pool = null;
   }
 }
 

@@ -6,22 +6,24 @@ export async function GET(): Promise<NextResponse> {
   try {
     const db = await getDb();
 
-    const users = await db.all<LeetCodeUser[]>(`
+    const result = await db.query<LeetCodeUser>(
+      `
       SELECT 
         username,
-        profile_url as profileUrl,
-        total_solved as totalSolved,
-        easy_solved as easySolved,
-        medium_solved as mediumSolved,
-        hard_solved as hardSolved,
-        total_submissions as totalSubmissions,
+        profile_url AS "profileUrl",
+        total_solved AS "totalSolved",
+        easy_solved AS "easySolved",
+        medium_solved AS "mediumSolved",
+        hard_solved AS "hardSolved",
+        total_submissions AS "totalSubmissions",
         score,
-        last_updated as lastUpdated
+        last_updated AS "lastUpdated"
       FROM users
       ORDER BY score DESC
-    `);
+      `
+    );
 
-    const formattedUsers = users.map((user) => ({
+    const formattedUsers = result.rows.map((user) => ({
       ...user,
       lastUpdated: new Date(user.lastUpdated).toISOString(),
     }));
