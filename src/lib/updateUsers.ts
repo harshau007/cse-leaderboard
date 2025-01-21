@@ -1,10 +1,16 @@
 import { calculateScore, getDb } from "@/lib/db";
 import { fetchUserSubmissions } from "@/lib/leetcode";
-import { PoolClient } from "pg";
+import type { PoolClient } from "pg";
 import type { SubmissionStats } from "./types";
 import { USERNAMES } from "./users";
 
-async function updateRanks(db: PoolClient): Promise<void> {
+interface RankChange {
+  username: string;
+  oldRank: number;
+  newRank: number;
+}
+
+async function updateRanks(db: PoolClient): Promise<RankChange[]> {
   const result = await db.query(`
     SELECT username, score, current_rank
     FROM users
@@ -12,6 +18,7 @@ async function updateRanks(db: PoolClient): Promise<void> {
   `);
 
   const users = result.rows;
+  const rankChanges: RankChange[] = [];
 
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
@@ -27,12 +34,21 @@ async function updateRanks(db: PoolClient): Promise<void> {
       `,
         [newRank, user.username]
       );
+
+      rankChanges.push({
+        username: user.username,
+        oldRank: user.current_rank,
+        newRank: newRank,
+      });
     }
   }
+
+  return rankChanges;
 }
 
-export async function fetchAndUpdateUsers(): Promise<void> {
+export async function fetchAndUpdateUsers(): Promise<RankChange[]> {
   const db = await getDb();
+  let rankChanges: RankChange[] = [];
 
   try {
     for (const username of USERNAMES) {
@@ -101,8 +117,10 @@ export async function fetchAndUpdateUsers(): Promise<void> {
       }
     }
 
-    await updateRanks(db);
+    rankChanges = await updateRanks(db);
   } finally {
     db.release();
   }
+
+  return rankChanges;
 }
