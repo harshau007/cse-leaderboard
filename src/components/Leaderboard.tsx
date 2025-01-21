@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -13,9 +12,8 @@ import {
 } from "@/components/ui/table";
 import { POINTS } from "@/lib/points";
 import type { LeetCodeUser } from "@/lib/types";
-// import { RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface LeaderboardProps {
   users: LeetCodeUser[];
@@ -23,7 +21,6 @@ interface LeaderboardProps {
 
 export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
   const [users, setUsers] = useState(initialUsers);
-  // const [isRefreshing, setIsRefreshing] = useState(false);
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
   const [mounted, setMounted] = useState(false);
 
@@ -31,8 +28,7 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
     setMounted(true);
   }, []);
 
-  const refreshData = async () => {
-    // setIsRefreshing(true);
+  const refreshData = useCallback(async () => {
     try {
       const response = await fetch("/api/cron");
       if (response.ok) {
@@ -45,14 +41,14 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
-    // setIsRefreshing(false);
     setTimeLeft(5 * 60); // Reset timer to 5 minutes
-  };
+  }, []);
 
   useEffect(() => {
+    refreshData(); // Fetch data immediately when component mounts
     const interval = setInterval(refreshData, 5 * 60 * 1000); // Refresh every 5 minutes
     return () => clearInterval(interval); // Cleanup on component unmount
-  }, []);
+  }, [refreshData]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,6 +57,10 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
 
     return () => clearInterval(timer); // Cleanup on component unmount
   }, []);
+
+  useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
 
   const formattedTime = `${Math.floor(timeLeft / 60)
     .toString()
@@ -78,10 +78,6 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Leaderboard</h2>
           <div className="flex items-center space-x-4">
-            {/* <Button onClick={refreshData} disabled={isRefreshing}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </Button> */}
             <div className="text-sm text-gray-600">
               Next update in: <span className="font-bold">{formattedTime}</span>
             </div>
@@ -129,7 +125,7 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
                   <TableCell className="font-medium flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-blue-400 flex items-center justify-center">
                       <img
-                        src={user.profileUrl}
+                        src={user.profileUrl || "/placeholder.svg"}
                         alt="P"
                         className="w-8 h-8 rounded-md"
                       />
