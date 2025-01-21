@@ -21,7 +21,7 @@ interface LeaderboardProps {
 
 export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
   const [users, setUsers] = useState(initialUsers);
-  const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes in seconds
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -41,12 +41,12 @@ export default function Leaderboard({ users: initialUsers }: LeaderboardProps) {
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
-    setTimeLeft(5 * 60); // Reset timer to 5 minutes
+    setTimeLeft(30 * 60); // Reset timer to 30 minutes
   }, []);
 
   useEffect(() => {
     refreshData(); // Fetch data immediately when component mounts
-    const interval = setInterval(refreshData, 5 * 60 * 1000); // Refresh every 5 minutes
+    const interval = setInterval(refreshData, 30 * 60 * 1000); // Refresh every 30 minutes
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [refreshData]);
 

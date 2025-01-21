@@ -12,7 +12,7 @@ export async function sendRankingChangeEmail(
 ) {
   try {
     const data = await resend.emails.send({
-      from: "LeetCode Leaderboard <noreply@cse-leaderboard.vercel.app>",
+      from: "LeetCode Leaderboard <onboarding@resend.dev>",
       to: [to],
       subject: displacedBy
         ? `Your LeetCode ranking has changed`
